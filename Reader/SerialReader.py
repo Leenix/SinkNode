@@ -1,5 +1,5 @@
 import sys
-from Reader import *
+from ..Reader import *
 import serial
 from serial import SerialException
 import logging
@@ -14,7 +14,6 @@ class SerialReader(Reader):
 
     def __init__(self, port, baud_rate, start_delimiter=None, stop_delimiter='\n',
                  logger_level=logging.CRITICAL):
-        super.__init__()
 
         self.start_delimiter = start_delimiter
         self.stop_delimiter = stop_delimiter
@@ -23,8 +22,9 @@ class SerialReader(Reader):
         self.baud_rate = baud_rate
         self.ser = serial.Serial()
 
-        self.read_thread = Thread(name="read_thread", target=self._read_loop())
         self.is_reading = False
+        self.read_thread = Thread(name="read_thread", target=self._read_loop())
+
 
         logging.basicConfig(level=logger_level)
         self.logger = logging.getLogger(__name__)

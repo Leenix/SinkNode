@@ -1,9 +1,30 @@
 __author__ = 'Leenix'
 
-from Processor import *
+from ..Processor import *
 from threading import Thread
 from Queue import Queue
-import json
+
+
+# Mapping between data id keys and Thingspeak fields
+EXAMPLE_KEY_MAP = {
+    "air_temp": "field1",
+    "wall_temp": "field2",
+    "surface_temp": "field3",
+    "case_temp": "field4",
+    "humidity": "field5",
+    "illuminance": "field6",
+    "sound": "field7",
+    "battery": "field8"
+}
+
+# Mapping between unit ID and Thingspeak channel
+EXAMPLE_CHANNEL_MAP = {
+    "<id_here>": "<API_KEY_HERE>",
+}
+
+# Thingspeak server address (change if using a custom server)
+# default: "api.thingspeak.com:80"
+SERVER_ADDRESS = "api.thingspeak.com:80"
 
 
 class ThingspeakProcessor(Processor):
@@ -11,8 +32,11 @@ class ThingspeakProcessor(Processor):
         self.channel_map = channel_map
         self.key_map = key_map
 
-        self.processor_thread = Thread(name="processor", target=self._process_loop())
+        self.in_queue = Queue()
+        self.out_queue = Queue
+
         self.is_processing = False
+        self.processor_thread = Thread(name="processor", target=self._process_loop())
 
     def _process_loop(self):
         """
@@ -83,23 +107,3 @@ class ThingspeakProcessor(Processor):
         return output
 
 
-# Mapping between data id keys and Thingspeak fields
-EXAMPLE_KEY_MAP = {
-    "air_temp": "field1",
-    "wall_temp": "field2",
-    "surface_temp": "field3",
-    "case_temp": "field4",
-    "humidity": "field5",
-    "illuminance": "field6",
-    "sound": "field7",
-    "battery": "field8"
-}
-
-# Mapping between unit ID and Thingspeak channel
-EXAMPLE_CHANNEL_MAP = {
-    "<id_here>": "<API_KEY_HERE>",
-}
-
-# Thingspeak server address (change if using a custom server)
-# default: "api.thingspeak.com:80"
-SERVER_ADDRESS = "api.thingspeak.com:80"

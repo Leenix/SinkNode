@@ -4,7 +4,7 @@ import urllib
 
 __author__ = 'Leenix'
 
-from Uploader import *
+from ..Uploader import *
 import time
 
 SERVER_ADDRESS = "api.thingspeak.com:80"
