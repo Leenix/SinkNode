@@ -1,10 +1,12 @@
 import sys
-from ..Reader import *
-import serial
-from serial import SerialException
 import logging
 from threading import Thread
 import json
+
+import serial
+from serial import SerialException
+
+from ..Reader import *
 
 
 class SerialReader(Reader):
@@ -25,7 +27,6 @@ class SerialReader(Reader):
         self.is_reading = False
         self.read_thread = Thread(name="read_thread", target=self._read_loop())
 
-
         logging.basicConfig(level=logger_level)
         self.logger = logging.getLogger(__name__)
 
@@ -38,6 +39,7 @@ class SerialReader(Reader):
         """
 
         try:
+            self.logger.info("Opening serial port [{}] with {} baud".format(self.port, self.baud_rate))
             self.ser.setBaudrate(self.baud_rate)
             self.ser.setPort(self.port)
             self.ser.open()
@@ -46,6 +48,7 @@ class SerialReader(Reader):
             self.logger.critical("Serial port [{}] cannot be opened :(".format(self.port))
             sys.exit()
 
+        self.logger.info("Starting reader")
         self.is_reading = True
         self.read_thread.run()
 
@@ -56,6 +59,8 @@ class SerialReader(Reader):
 
         :return: None
         """
+
+        self.logger.info("Stopping reader")
         self.ser.close()
         self.is_reading = False
 
@@ -85,6 +90,7 @@ class SerialReader(Reader):
 
                 else:
                     entry = self.convert_to_json(received)
+                    self.logger.debug("Incoming packet: {}".format(entry))
                     self.read_queue.put(entry)
 
     def convert_to_json(self, entry_line):

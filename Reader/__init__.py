@@ -1,6 +1,7 @@
 __author__ = 'Leenix'
 
 from Queue import Queue
+import logging
 
 
 class Reader:
@@ -9,8 +10,10 @@ class Reader:
     Reads data from a source, which is specified by the child class.
     Data is converted into JSON format, then placed in a queue for processing.
     """
-    def __init__(self):
+
+    def __init__(self, logger_level=logging.CRITICAL):
         self.reader_queue = Queue()
+        self.logger = logging.basicConfig(level=logger_level)
 
     def stop(self):
         """

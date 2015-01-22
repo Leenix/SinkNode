@@ -1,8 +1,11 @@
 __author__ = 'Leenix'
 
-from ..Processor import *
 from threading import Thread
 from Queue import Queue
+import logging
+
+from ..Processor import *
+
 
 
 # Mapping between data id keys and Thingspeak fields
@@ -28,9 +31,12 @@ SERVER_ADDRESS = "api.thingspeak.com:80"
 
 
 class ThingspeakProcessor(Processor):
-    def __init__(self, channel_map=EXAMPLE_CHANNEL_MAP, key_map=EXAMPLE_KEY_MAP):
+    def __init__(self, channel_map=EXAMPLE_CHANNEL_MAP, key_map=EXAMPLE_KEY_MAP, logger_level=logging.CRITICAL):
         self.channel_map = channel_map
         self.key_map = key_map
+
+        logging.basicConfig(level=logger_level)
+        self.logger = logging.getLogger(__name__)
 
         self.in_queue = Queue()
         self.out_queue = Queue
@@ -41,7 +47,7 @@ class ThingspeakProcessor(Processor):
     def _process_loop(self):
         """
         Processing loop for the processor
-        :return:
+        :return: None
         """
         entry = self.in_queue.get()
         output = self.process_entry(entry)
@@ -55,6 +61,8 @@ class ThingspeakProcessor(Processor):
 
         :return: None
         """
+
+        self.logger.debug("Processor starting")
         self.is_processing = True
         self.processor_thread.start()
 
@@ -65,6 +73,7 @@ class ThingspeakProcessor(Processor):
 
         :return: None
         """
+        self.logger.debug("Processor stopping")
         self.is_processing = False
 
     def process_entry(self, entry):
@@ -104,6 +113,7 @@ class ThingspeakProcessor(Processor):
                     new_key = self.key_map[k]
                     output[new_key] = entry[k]
 
+        self.logger.info("Processed packet: {}".format(output))
         return output
 
 
