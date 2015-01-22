@@ -6,6 +6,15 @@ from Uploader import *
 
 
 class SinkNode:
+    """
+    Simple data ingestor made up of 3 processes: a reader, processor, and uploader.
+
+    Reader      - Reads in data from a source and produces a JSON-format packet
+    Processor   - Alters the data for uploading/storage
+    Uploader    - Uploads the processed data to a server or file
+
+    All processes use individual threads with data between transferred using data queues.
+    """
 
     def __init__(self, reader, processor, uploader):
         self.read_queue = Queue()
@@ -29,3 +38,7 @@ class SinkNode:
         self.processor.run()
         self.uploader.run()
 
+    def stop(self):
+        self.reader.stop()
+        self.processor.stop()
+        self.uploader.stop()
