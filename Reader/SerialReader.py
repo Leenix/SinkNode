@@ -6,7 +6,7 @@ import json
 import serial
 from serial import SerialException
 
-from ..Reader import *
+from SinkNode.Reader import *
 
 
 class SerialReader(Reader):
@@ -16,18 +16,21 @@ class SerialReader(Reader):
 
     def __init__(self, port, baud_rate, start_delimiter=None, stop_delimiter='\n',
                  logger_name=__name__):
-
-        self.start_delimiter = start_delimiter
-        self.stop_delimiter = stop_delimiter
-
         self.port = port
         self.baud_rate = baud_rate
         self.ser = serial.Serial()
-
-        self.is_reading = False
-        self.read_thread = Thread(name="read_thread", target=self._read_loop())
+        self.start_delimiter = start_delimiter
+        self.stop_delimiter = stop_delimiter
 
         self.logger = logging.getLogger(logger_name)
+        if self.logger.name == __name__:
+            self.logger.addHandler(logging.StreamHandler())
+            self.logger.setLevel(logging.INFO)
+
+        self.reader_queue = Queue()
+
+        self.is_reading = False
+        self.read_thread = Thread(name="read_thread", target=self._read_loop)
 
     def run(self):
         """
@@ -38,18 +41,18 @@ class SerialReader(Reader):
         """
 
         try:
-            self.logger.info("Opening serial port [{}] with {} baud".format(self.port, self.baud_rate))
+            self.logger.debug("Opening serial port [{}] with {} baud".format(self.port, self.baud_rate))
             self.ser.setBaudrate(self.baud_rate)
             self.ser.setPort(self.port)
             self.ser.open()
 
         except SerialException:
-            self.logger.critical("Serial port [{}] cannot be opened :(".format(self.port))
+            self.logger.error("Serial port [{}] cannot be opened :(".format(self.port))
             sys.exit()
 
-        self.logger.info("Starting reader")
+        self.logger.debug("Starting reader thread")
         self.is_reading = True
-        self.read_thread.run()
+        self.read_thread.start()
 
     def stop(self):
         """
@@ -59,7 +62,7 @@ class SerialReader(Reader):
         :return: None
         """
 
-        self.logger.info("Stopping reader")
+        self.logger.debug("Stopping reader thread")
         self.ser.close()
         self.is_reading = False
 
@@ -70,6 +73,7 @@ class SerialReader(Reader):
 
         :return: None
         """
+
         recording_entry = False
         received = ""
 
@@ -88,9 +92,11 @@ class SerialReader(Reader):
                     received += c
 
                 else:
+                    recording_entry = False
                     entry = self.convert_to_json(received)
-                    self.logger.debug("Incoming packet: {}".format(entry))
-                    self.read_queue.put(entry)
+                    self.logger.info("Incoming packet: {}".format(entry))
+                    self.reader_queue.put(entry)
+                    received = ""
 
     def convert_to_json(self, entry_line):
         """
@@ -100,6 +106,8 @@ class SerialReader(Reader):
         :param entry_line: JSON-formatted string
         :return: JSON object of the entry string
         """
+
+        entry = ""
         try:
             entry = json.loads(entry_line)
 
@@ -107,4 +115,20 @@ class SerialReader(Reader):
             pass
 
         return entry
+
+if __name__ == '__main__':
+    read_queue = Queue()
+    logger = logging.getLogger("SerialReader")
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+    reader = SerialReader("COM4", 57600, '#', '$', logger.name)
+
+    reader.set_queue(read_queue)
+    reader.run()
+
+    while True:
+        packet = read_queue.get()
+        logger.info("Packet: {}".format(packet))
+        read_queue.task_done()
+
 

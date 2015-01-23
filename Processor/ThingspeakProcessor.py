@@ -34,23 +34,15 @@ class ThingspeakProcessor(Processor):
         self.key_map = key_map
 
         self.logger = logging.getLogger(logger_name)
+        if self.logger.name == __name__:
+            self.logger.addHandler(logging.StreamHandler())
+            self.logger.setLevel(logging.INFO)
 
         self.in_queue = Queue()
-        self.out_queue = Queue
+        self.out_queue = Queue()
 
         self.is_processing = False
-        self.processor_thread = Thread(name="processor", target=self._process_loop())
-
-    def _process_loop(self):
-        """
-        Processing loop for the processor
-        :return: None
-        """
-        entry = self.in_queue.get()
-        output = self.process_entry(entry)
-        self.in_queue.task_done()
-
-        self.out_queue.put(output)
+        self.processor_thread = Thread(name="processor", target=self._process_loop)
 
     def run(self):
         """
@@ -59,7 +51,7 @@ class ThingspeakProcessor(Processor):
         :return: None
         """
 
-        self.logger.debug("Processor starting")
+        self.logger.debug("Starting processor thread")
         self.is_processing = True
         self.processor_thread.start()
 
@@ -72,6 +64,20 @@ class ThingspeakProcessor(Processor):
         """
         self.logger.debug("Processor stopping")
         self.is_processing = False
+
+    def _process_loop(self):
+        """
+        Processing loop for the processor
+        :return: None
+        """
+
+        while self.is_processing:
+            entry = self.in_queue.get()
+            output = self.process_entry(entry)
+            self.in_queue.task_done()
+
+            if "key" in output.keys():
+                self.out_queue.put(output)
 
     def process_entry(self, entry):
         """Process an incoming JSON entry into thingspeak format.
@@ -112,5 +118,4 @@ class ThingspeakProcessor(Processor):
 
         self.logger.info("Processed packet: {}".format(output))
         return output
-
 

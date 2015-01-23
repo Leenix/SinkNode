@@ -19,13 +19,19 @@ class ThingspeakUploader(Uploader):
         self.upload_delay = upload_delay
 
         self.logger = logging.getLogger(logger_name)
-        self.uploader = Thread(name="uploader", target=self._upload_loop())
+        if self.logger.name == __name__:
+            self.logger.addHandler(logging.StreamHandler())
+            self.logger.setLevel(logging.INFO)
+
+        self.upload_queue = Queue()
+
+        self.upload_thread = Thread(name="uploader", target=self._uploader_loop)
         self.is_uploading = False
 
     def run(self):
-        self.logger.info("Starting upload thread")
+        self.logger.debug("Starting upload thread")
         self.is_uploading = True
-        self.uploader.start()
+        self.upload_thread.start()
 
     def _uploader_loop(self):
         while self.is_uploading:
@@ -36,17 +42,17 @@ class ThingspeakUploader(Uploader):
                 self.upload_entry(entry)
 
                 self.upload_queue.task_done()
-                self.logger.debug("Upload successful")
+                self.logger.info("Upload successful")
 
                 # Thingspeak can only accept a packet every 15 seconds
                 time.sleep(self.upload_delay)
 
             except Exception:
-                self.logger.error("Packet could not be uploaded")
+                self.logger.warning("Packet could not be uploaded")
                 time.sleep(2)
 
     def stop(self):
-        self.logger.info("Stopping upload thread")
+        self.logger.debug("Stopping upload thread")
         self.is_uploading = False
 
     def upload_entry(self, entry):
