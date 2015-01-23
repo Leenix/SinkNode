@@ -15,7 +15,7 @@ class SerialReader(Reader):
     """
 
     def __init__(self, port, baud_rate, start_delimiter=None, stop_delimiter='\n',
-                 logger_level=logging.CRITICAL):
+                 logger_name=__name__):
 
         self.start_delimiter = start_delimiter
         self.stop_delimiter = stop_delimiter
@@ -27,8 +27,7 @@ class SerialReader(Reader):
         self.is_reading = False
         self.read_thread = Thread(name="read_thread", target=self._read_loop())
 
-        logging.basicConfig(level=logger_level)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(logger_name)
 
     def run(self):
         """

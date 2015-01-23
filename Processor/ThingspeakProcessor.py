@@ -1,8 +1,6 @@
 __author__ = 'Leenix'
 
 from threading import Thread
-from Queue import Queue
-import logging
 
 from ..Processor import *
 
@@ -31,12 +29,11 @@ SERVER_ADDRESS = "api.thingspeak.com:80"
 
 
 class ThingspeakProcessor(Processor):
-    def __init__(self, channel_map=EXAMPLE_CHANNEL_MAP, key_map=EXAMPLE_KEY_MAP, logger_level=logging.CRITICAL):
+    def __init__(self, channel_map=EXAMPLE_CHANNEL_MAP, key_map=EXAMPLE_KEY_MAP, logger_name=__name__):
         self.channel_map = channel_map
         self.key_map = key_map
 
-        logging.basicConfig(level=logger_level)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(logger_name)
 
         self.in_queue = Queue()
         self.out_queue = Queue
