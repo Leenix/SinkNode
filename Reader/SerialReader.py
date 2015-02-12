@@ -2,7 +2,7 @@ import sys
 import logging
 from threading import Thread
 import json
-
+from Queue import Queue
 import serial
 from serial import SerialException
 
