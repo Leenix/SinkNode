@@ -8,8 +8,11 @@ import time
 class WalkerReader(XBeeReader):
     UNIT_CLASS = "stalker"
 
-    def __init__(self, port, baud, logger_name):
-        super.__init__(port, baud, logger_name=logger_name)
+    def __init__(self, port, baud_rate, logger_name=__name__):
+        XBeeReader.__init__(self, port, baud_rate, logger_name)
+
+    # def __init__(self, port, baud, logger_name=__name__):
+      #  WalkerReader.__init__(self, port, baud, logger_name)
 
     def convert_to_json(self, entry_line):
         """

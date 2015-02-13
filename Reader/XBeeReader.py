@@ -19,7 +19,7 @@ if 'api_responses' in ZigBee.__dict__:
 
 class XBeeReader(SerialReader):
     def __init__(self, port, baud_rate, logger_name=__name__):
-        super.__init__(self, port, baud_rate, logger_name=logger_name)
+        SerialReader.__init__(self, port, baud_rate, logger_name=logger_name)
         self.xbee = ZigBee(self.ser)
 
     def _read_loop(self):
