@@ -1,24 +1,17 @@
 import sys
 import logging
 from threading import Thread
-import json
-from Queue import Queue
-import serial
-from serial import SerialException
+
 
 from SinkNode.Reader import *
 
 
-class SerialReader(Reader):
+class StandardInReader(Reader):
     """
     Serial reader that sorts the incoming stream into packets.
     """
 
-    def __init__(self, port, baud_rate, start_delimiter=None, stop_delimiter='\n',
-                 logger_name=__name__):
-        self.port = port
-        self.baud_rate = baud_rate
-        self.ser = serial.Serial()
+    def __init__(self, start_delimiter=" ", stop_delimiter='\n', logger_name=__name__):
         self.start_delimiter = start_delimiter
         self.stop_delimiter = stop_delimiter
 
@@ -40,16 +33,6 @@ class SerialReader(Reader):
         :return: None
         """
 
-        try:
-            self.logger.debug("Opening serial port [{}] with {} baud".format(self.port, self.baud_rate))
-            self.ser.setBaudrate(self.baud_rate)
-            self.ser.setPort(self.port)
-            self.ser.open()
-
-        except SerialException:
-            self.logger.error("Serial port [{}] cannot be opened :(".format(self.port))
-            sys.exit()
-
         self.logger.debug("Starting reader thread")
         self.is_reading = True
         self.read_thread.start()
@@ -63,7 +46,6 @@ class SerialReader(Reader):
         """
 
         self.logger.debug("Stopping reader thread")
-        self.ser.close()
         self.is_reading = False
 
     def _read_loop(self):
@@ -79,7 +61,7 @@ class SerialReader(Reader):
 
         while self.is_reading:
 
-            c = self.ser.read()
+            c = sys.stdin.read(1);
 
             # Don't record any incoming characters until a 'start' is received
             if not recording_entry:
@@ -101,10 +83,10 @@ class SerialReader(Reader):
 
 if __name__ == '__main__':
     read_queue = Queue()
-    logger = logging.getLogger("SerialReader")
+    logger = logging.getLogger("StandardInReader")
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
-    reader = SerialReader("COM4", 57600, '#', '$', logger.name)
+    reader = StandardInReader(logger_name=logger.name)
 
     reader.set_queue(read_queue)
     reader.run()

@@ -1,6 +1,7 @@
 __author__ = 'Leenix'
 
 from Queue import Queue
+import json
 
 
 class Reader:
@@ -31,13 +32,21 @@ class Reader:
 
     def convert_to_json(self, entry_line):
         """
-        Convert the received entry to JSON format
-        Actual format depends on child class method
+        Convert the entry line to JSON
+        Entry lines should already be in a JSON string; extract it.
 
-        :param entry_line: Packetised entry line to be formatted
-        :return: Entry in JSON format
+        :param entry_line: JSON-formatted string
+        :return: JSON object of the entry string
         """
-        raise Exception("Method [run] not implemented")
+
+        entry = ""
+        try:
+            entry = json.loads(entry_line)
+
+        except ValueError:
+            pass
+
+        return entry
 
     def set_queue(self, queue):
         assert isinstance(queue, Queue)
