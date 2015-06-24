@@ -1,18 +1,30 @@
-__author__ = 'Leenix'
-
+import logging
+from threading import Thread
 from Queue import Queue
 import json
+import SinkNode
+
+__author__ = 'Leenix'
 
 
-class Reader:
+class Reader(object):
     """
     Parent class.
     Reads data from a source, which is specified by the child class.
     Data is converted into JSON format, then placed in a queue for processing.
     """
 
-    def __init__(self):
-        self.reader_queue = Queue()
+    def __init__(self, outbox=None, logger_level=logging.FATAL):
+        self.outbox = outbox
+
+        self.is_running = False
+        self.read_thread = Thread(target=self._read_loop)
+
+        self.logger = logging.getLogger(__name__)
+        log_handler = logging.StreamHandler()
+        log_handler.setFormatter(logging.Formatter(SinkNode.LOGGER_FORMAT))
+        self.logger.addHandler(log_handler)
+        self.logger.setLevel(logger_level)
 
     def stop(self):
         """
@@ -20,16 +32,42 @@ class Reader:
         Halting the read does not affect the read queue.
         :return:
         """
-        raise Exception("Method [stop] not implemented")
+        self.logger.info("Stopping reader...")
+        self.is_running = False
 
-    def run(self):
+    def start(self):
         """
         Read in packets of data and convert them to JSON format
         JSON packets are placed in the read queue to await further processing
         :return:
         """
-        raise Exception("Method [run] not implemented")
+        assert isinstance(self.outbox, Queue)
+        self.is_running = True
+        self.read_thread.start()
+        self.logger.info("Starting reader...")
 
+    def _read_loop(self):
+        """
+        Read in data from a source or stream
+        Data is packetised and converted into JSON format
+        :return:
+        """
+        while self.is_running:
+            raw_entry = self.read_entry()
+            self.logger.debug("Raw entry: " + raw_entry)
+
+            processed_entry = self.convert_to_json(raw_entry)
+            self.outbox.put(processed_entry)
+
+    def read_entry(self):
+        """
+        Read a single data entry in from the source stream
+        No data formatting is performed. Data is just cut into a manageable chunk
+        :return:
+        """
+        raise Exception("Method [read_entry] not implemented")
+
+    # TODO - change reader to use a processor class as well - or leave as-is
     def convert_to_json(self, entry_line):
         """
         Convert the entry line to JSON
@@ -48,7 +86,12 @@ class Reader:
 
         return entry
 
-    def set_queue(self, queue):
+    def set_outbox(self, queue):
+        """
+        Set the output destination of parsed entries
+        :param queue: Queue object that will hold parsed entries
+        :return:
+        """
         assert isinstance(queue, Queue)
-        self.reader_queue = queue
+        self.outbox = queue
 

@@ -25,7 +25,7 @@ class StandardInReader(Reader):
         self.is_reading = False
         self.read_thread = Thread(name="read_thread", target=self._read_loop)
 
-    def run(self):
+    def start(self):
         """
         Start the read loop for Serial input.
         Received packets are entered into the read_queue.
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     reader = StandardInReader(logger_name=logger.name)
 
     reader.set_queue(read_queue)
-    reader.run()
+    reader.start()
 
     while True:
         packet = read_queue.get()
