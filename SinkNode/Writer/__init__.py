@@ -1,7 +1,11 @@
 import logging
 from threading import Thread
-from ..Formatter import Formatter
-import SinkNode
+
+from SinkNode import Formatter
+from SinkNode.Formatter import RawFormatter
+
+
+LOGGER_FORMAT = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
 
 __author__ = 'Leenix'
 
@@ -11,6 +15,9 @@ from Queue import Queue
 class Writer(object):
     def __init__(self, formatter=None, writer_id=__name__, logger_level=logging.FATAL):
         self.id = writer_id
+
+        if formatter is None:
+            formatter = RawFormatter()
         self.formatter = formatter
 
         # Incoming entries are passed to the format queue, which are processed and passed to the write queue
@@ -22,7 +29,7 @@ class Writer(object):
         # Set up logging stuff...
         self.logger = logging.getLogger(writer_id)
         log_handler = logging.StreamHandler()
-        log_handler.setFormatter(logging.Formatter(SinkNode.LOGGER_FORMAT))
+        log_handler.setFormatter(logging.Formatter(LOGGER_FORMAT))
         self.logger.addHandler(log_handler)
         self.logger.setLevel(logger_level)
 

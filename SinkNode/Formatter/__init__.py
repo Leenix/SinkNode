@@ -1,7 +1,8 @@
 from threading import Thread
-import SinkNode
 
 __author__ = 'Leenix'
+
+LOGGER_FORMAT = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
 
 from Queue import Queue
 import logging
@@ -23,7 +24,7 @@ class Formatter(object):
         # Set up logging stuff...
         self.logger = logging.getLogger(id)
         log_handler = logging.StreamHandler()
-        log_handler.setFormatter(logging.Formatter(SinkNode.LOGGER_FORMAT))
+        log_handler.setFormatter(logging.Formatter(LOGGER_FORMAT))
         self.logger.addHandler(log_handler)
         self.logger.setLevel(logger_level)
 

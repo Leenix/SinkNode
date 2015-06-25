@@ -1,11 +1,11 @@
 import httplib
 import urllib
-from ..Formatter.ThingspeakFormatter import ThingspeakFormatter
+import time
+import logging
+from SinkNode.Formatter.ThingspeakFormatter import ThingspeakFormatter
+from SinkNode.Writer import Writer
 
 __author__ = 'Leenix'
-
-from ..Writer import *
-import time
 
 SERVER_ADDRESS = "api.thingspeak.com:80"
 THINGSPEAK_DELAY = 15
@@ -50,6 +50,7 @@ class ThingspeakWriter(Writer):
             try:
                 self.logger.debug("Attempting upload...")
 
+                # TODO - Switch to 'requests' library instead of httplib/urllib
                 params = urllib.urlencode(entry)
                 conn = httplib.HTTPConnection(self.server_address)
                 conn.request("POST", "/update", params, HEADERS)

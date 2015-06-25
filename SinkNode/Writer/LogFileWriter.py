@@ -1,5 +1,5 @@
 import logging
-from .. import Writer
+from SinkNode.Writer import Writer
 import datetime
 
 __author__ = 'Leenix'

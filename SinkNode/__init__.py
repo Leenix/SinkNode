@@ -1,11 +1,9 @@
-from threading import Thread
+__author__ = 'Leenix'
 import datetime
 
 __author__ = 'Leenix'
 
-from Reader import *
-from Formatter import *
-from Writer import *
+from SinkNode.Writer import *
 
 LOGGER_FORMAT = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
 

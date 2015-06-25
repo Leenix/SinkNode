@@ -1,6 +1,6 @@
 import logging
 from unittest import TestCase
-from SinkNode.Formatter.CSVProcessor import CSVFormatter
+from SinkNode.Formatter.CSVFormatter import CSVFormatter
 
 __author__ = 'Leenix'
 

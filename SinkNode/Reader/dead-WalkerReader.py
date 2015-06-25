@@ -2,7 +2,7 @@
 from XBeeReader import *
 import datetime
 import struct
-import time
+
 
 
 class WalkerReader(XBeeReader):

@@ -3,7 +3,7 @@ import logging
 from Queue import Queue
 import serial
 from serial import SerialException
-from ..Reader import Reader
+from SinkNode.Reader import Reader
 
 
 class SerialReader(Reader):

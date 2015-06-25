@@ -1,5 +1,6 @@
+import logging
+from SinkNode.Formatter import Formatter
 
-from Formatter import Formatter
 __author__ = 'Leenix'
 
 
@@ -10,6 +11,9 @@ class RawFormatter(Formatter):
     All entries that pass through are kept in the same JSON format in which they entered.
     Useful for when no formatting change is necessary
     """
+
+    def __init__(self, outbox=None, logger_level=logging.FATAL):
+        super(RawFormatter, self).__init__(outbox=outbox, logger_level=logger_level, id="RawFormatter")
 
     def format_entry(self, entry):
         """

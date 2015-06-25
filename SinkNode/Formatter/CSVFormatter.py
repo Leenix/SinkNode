@@ -1,4 +1,4 @@
-from .. import Formatter
+from SinkNode.Formatter import Formatter
 import logging
 
 __author__ = 'Leenix'
@@ -28,7 +28,9 @@ class CSVFormatter(Formatter):
             for key in self.columns:
                 if key in entry.keys():
                     output += str(entry.pop(key))
-                    output += ","
+                else:
+                    output += "-"
+                output += ","
 
         # Check for any left-over columns that need to be added
         new_columns = len(entry) > 0

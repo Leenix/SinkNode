@@ -1,6 +1,7 @@
 __author__ = 'Leenix'
 
-from ..Formatter import *
+from SinkNode.Formatter import Formatter
+import logging
 
 # Mapping between data id keys and Thingspeak fields
 EXAMPLE_KEY_MAP = {

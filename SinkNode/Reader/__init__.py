@@ -2,7 +2,8 @@ import logging
 from threading import Thread
 from Queue import Queue
 import json
-import SinkNode
+
+LOGGER_FORMAT = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
 
 __author__ = 'Leenix'
 
@@ -22,7 +23,7 @@ class Reader(object):
 
         self.logger = logging.getLogger(__name__)
         log_handler = logging.StreamHandler()
-        log_handler.setFormatter(logging.Formatter(SinkNode.LOGGER_FORMAT))
+        log_handler.setFormatter(logging.Formatter(LOGGER_FORMAT))
         self.logger.addHandler(log_handler)
         self.logger.setLevel(logger_level)
 
