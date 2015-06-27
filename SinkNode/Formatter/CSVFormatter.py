@@ -6,7 +6,7 @@ __author__ = 'Leenix'
 
 class CSVFormatter(Formatter):
     def __init__(self, outbox=None, logger_level=logging.FATAL):
-        super(CSVFormatter, self).__init__(outbox=outbox, logger_level=logger_level, id="CSVFormatter")
+        super(CSVFormatter, self).__init__(outbox=outbox, logger_level=logger_level, formatter_id="CSVFormatter")
 
         self.columns = []
 

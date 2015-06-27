@@ -11,7 +11,7 @@ TEST_FIELD_MAP = {
 class TestThingspeakFormatter(TestCase):
 
     def setUp(self):
-        self.formatter = ThingspeakFormatter(id="test",
+        self.formatter = ThingspeakFormatter(formatter_id="test",
                                              api_key="TEST_API",
                                              key_map=TEST_FIELD_MAP,
                                              logger_level=logging.DEBUG)

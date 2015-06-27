@@ -3,6 +3,7 @@
     <words>
       <w>ingestor</w>
       <w>thingspeak</w>
+      <w>xbee</w>
     </words>
   </dictionary>
 </component>

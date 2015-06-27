@@ -12,8 +12,8 @@ class RawFormatter(Formatter):
     Useful for when no formatting change is necessary
     """
 
-    def __init__(self, outbox=None, logger_level=logging.FATAL):
-        super(RawFormatter, self).__init__(outbox=outbox, logger_level=logger_level, id="RawFormatter")
+    def __init__(self, outbox=None, logger_level=logging.FATAL, formatter_id="RawFormatter"):
+        super(RawFormatter, self).__init__(outbox=outbox, logger_level=logger_level, formatter_id=formatter_id)
 
     def format_entry(self, entry):
         """

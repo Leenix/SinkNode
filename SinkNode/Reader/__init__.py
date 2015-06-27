@@ -15,7 +15,7 @@ class Reader(object):
     Data is converted into JSON format, then placed in a queue for processing.
     """
 
-    def __init__(self, outbox=None, logger_level=logging.FATAL):
+    def __init__(self, outbox=None, logger_level=logging.FATAL, logger_format=LOGGER_FORMAT):
         self.outbox = outbox
 
         self.is_running = False
@@ -23,7 +23,7 @@ class Reader(object):
 
         self.logger = logging.getLogger(__name__)
         log_handler = logging.StreamHandler()
-        log_handler.setFormatter(logging.Formatter(LOGGER_FORMAT))
+        log_handler.setFormatter(logging.Formatter(logger_format))
         self.logger.addHandler(log_handler)
         self.logger.setLevel(logger_level)
 
@@ -42,7 +42,6 @@ class Reader(object):
         JSON packets are placed in the read queue to await further processing
         :return:
         """
-        assert isinstance(self.outbox, Queue)
         self.is_running = True
         self.read_thread.start()
         self.logger.info("Starting reader...")

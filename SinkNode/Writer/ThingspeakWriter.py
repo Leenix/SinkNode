@@ -27,7 +27,7 @@ class ThingspeakWriter(Writer):
                                              key_map,
                                              outbox=None,
                                              logger_level=logger_level,
-                                             id=writer_id+"Formatter")
+                                             formatter_id=writer_id+"Formatter")
 
         super(ThingspeakWriter, self).__init__(formatter=self.formatter, logger_level=logger_level, writer_id=writer_id)
 

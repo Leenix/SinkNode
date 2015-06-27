@@ -14,7 +14,7 @@ class Formatter(object):
     Transforms incoming JSON data packets to another format for writing or uploading.
     Output format is dictated by the child class.
     """
-    def __init__(self, outbox=None, logger_level=logging.FATAL, id=__name__):
+    def __init__(self, outbox=None, logger_level=logging.FATAL, formatter_id=__name__, logger_format=LOGGER_FORMAT):
         self.logger = logging.getLogger(__name__)
 
         # The inbox queue can be either internal or externally passed in. The outbox must be specified
@@ -22,9 +22,9 @@ class Formatter(object):
         self.outbox = outbox
 
         # Set up logging stuff...
-        self.logger = logging.getLogger(id)
+        self.logger = logging.getLogger(formatter_id)
         log_handler = logging.StreamHandler()
-        log_handler.setFormatter(logging.Formatter(LOGGER_FORMAT))
+        log_handler.setFormatter(logging.Formatter(logger_format))
         self.logger.addHandler(log_handler)
         self.logger.setLevel(logger_level)
 

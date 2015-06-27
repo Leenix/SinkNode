@@ -13,7 +13,7 @@ from Queue import Queue
 
 
 class Writer(object):
-    def __init__(self, formatter=None, writer_id=__name__, logger_level=logging.FATAL):
+    def __init__(self, formatter=None, writer_id=__name__, logger_level=logging.FATAL, logger_format=LOGGER_FORMAT):
         self.id = writer_id
 
         if formatter is None:
@@ -29,7 +29,7 @@ class Writer(object):
         # Set up logging stuff...
         self.logger = logging.getLogger(writer_id)
         log_handler = logging.StreamHandler()
-        log_handler.setFormatter(logging.Formatter(LOGGER_FORMAT))
+        log_handler.setFormatter(logging.Formatter(logger_format))
         self.logger.addHandler(log_handler)
         self.logger.setLevel(logger_level)
 
@@ -49,7 +49,6 @@ class Writer(object):
         Start writing packets
         :return: None
         """
-        assert isinstance(self.formatter, Formatter)
         self.logger.info("Starting writer [%s]", self.get_id())
         self.is_running = True
         self.write_thread.start()

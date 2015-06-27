@@ -10,7 +10,7 @@ LOGGER_FORMAT = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
 
 class SinkNode:
 
-    def __init__(self, reader, logger_level=logging.FATAL):
+    def __init__(self, reader=None, logger_level=logging.FATAL):
 
         # Set up logging stuff
         self.logger = logging.getLogger("Main")
@@ -29,12 +29,22 @@ class SinkNode:
         self.writer_list = []
 
         # At this point, only one reader is allowed
+        self.readers = []
         # TODO - Add the capacity for several readers (they just need to output to the same queue)
-        self.reader = reader
-        self.reader.set_outbox(self.read_queue)
+        if reader is not None:
+            self.add_reader(reader)
 
         self.is_running = False
         self.process_thread = Thread(name="main", target=self._main_loop)
+
+    def add_reader(self, reader):
+        """
+        Add a reader to the system
+        :param reader:
+        :return:
+        """
+        reader.set_outbox(self.read_queue)
+        self.readers.append(reader)
 
     def add_writer(self, writer):
         """
@@ -66,7 +76,8 @@ class SinkNode:
         """
 
         self.logger.debug("Starting readers...")
-        self.reader.start()
+        for reader in self.readers:
+            reader.start()
 
         # Fire up the logger list
         # TODO - start up writer threads on creation?

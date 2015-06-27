@@ -27,8 +27,8 @@ class ThingspeakFormatter(Formatter):
 
     Each formatter should handle one thingspeak channel each. Therefore, API keys are matched to each channel.
     """
-    def __init__(self, api_key, key_map, outbox=None, id=__name__, logger_level=logging.FATAL):
-        super(ThingspeakFormatter, self).__init__(self, logger_level=logger_level, id=id)
+    def __init__(self, api_key, key_map, outbox=None, formatter_id=__name__, logger_level=logging.FATAL):
+        super(ThingspeakFormatter, self).__init__(self, logger_level=logger_level, formatter_id=formatter_id)
         self.outbox = outbox
         self.api_key = api_key
         self.key_map = key_map
