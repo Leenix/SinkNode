@@ -3,7 +3,7 @@ import Queue
 __author__ = 'Leenix'
 
 from SinkNode.Writer import Writer
-from SinkNode.Formatter import RawFormatter
+from SinkNode.Formatter.RawFormatter import RawFormatter
 import logging
 
 
