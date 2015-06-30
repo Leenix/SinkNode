@@ -25,8 +25,8 @@ class SinkNode:
         # There are two write queues
         # The writers in the Logger queue will always attempt to write any entry read in
         # Writers in the Write queue will filter out entries based on entry 'id'
-        self.logger_list = []
-        self.writer_list = []
+        self.loggers = []
+        self.writers = []
 
         # At this point, only one reader is allowed
         self.readers = []
@@ -54,7 +54,7 @@ class SinkNode:
         :return:
         """
         assert writer.get_id() is not ""
-        self.writer_list.append(writer)
+        self.writers.append(writer)
         self.logger.debug("Writer added [%s]", writer.get_id())
 
     def add_logger(self, logger):
@@ -65,7 +65,7 @@ class SinkNode:
         :return:
         """
         assert isinstance(logger, Writer)
-        self.logger_list.append(logger)
+        self.loggers.append(logger)
         self.logger.debug("Logger added [%s]", logger.get_id())
 
     def start(self):
@@ -82,12 +82,12 @@ class SinkNode:
         # Fire up the logger list
         # TODO - start up writer threads on creation?
         self.logger.debug("Starting loggers...")
-        for logger in self.logger_list:
+        for logger in self.loggers:
             logger.start()
 
         # Fire up the conditional writers
         self.logger.debug("Starting writers...")
-        for writer in self.writer_list:
+        for writer in self.writers:
             writer.start()
 
         self.is_running = True
@@ -101,12 +101,14 @@ class SinkNode:
         :return:
         """
         self.logger.info("Main thread stopping..")
-        self.reader.stop()
 
-        for logger in self.logger_list:
+        for reader in self.readers:
+            reader.stop()
+
+        for logger in self.loggers:
             logger.stop()
 
-        for writer in self.writer_list:
+        for writer in self.writers:
             writer.stop()
 
         self.is_running = False
@@ -121,11 +123,11 @@ class SinkNode:
             entry = self.read_queue.get()
             self.logger.info("Entry received - %s", datetime.datetime.now().isoformat())
 
-            for logger in self.logger_list:
+            for logger in self.loggers:
                 self.logger.debug("Entry sent to logger [%s]", logger.get_id())
                 logger.add_entry(entry.copy())
 
-            for writer in self.writer_list:
+            for writer in self.writers:
                 if entry["id"] == writer.get_id():
                     self.logger.debug("Entry sent to writer [%s]", writer.get_id())
                     writer.add_entry(entry.copy())

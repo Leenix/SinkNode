@@ -7,6 +7,7 @@ __author__ = 'Leenix'
 
 class LogFileWriter(Writer):
     def __init__(self, filename,
+                 path="",
                  formatter=None,
                  timestamp=True,
                  monthly_files=True,
@@ -15,6 +16,7 @@ class LogFileWriter(Writer):
 
         super(LogFileWriter, self).__init__(formatter=formatter, logger_level=logger_level, writer_id=writer_id)
         self.logger.name = writer_id
+        self.path = path
         self.filename = filename
         self.monthly_files = monthly_files
         self.timestamp_enabled = timestamp
@@ -31,7 +33,7 @@ class LogFileWriter(Writer):
         if self.monthly_files:
             prefix = datetime.datetime.now().strftime("%Y-%m ")
 
-        logfile = open(prefix + self.filename, 'ab')
+        logfile = open(self.path + prefix + self.filename, 'ab')
 
         # Add the entry line-by-line to include a timestamp on each line
         entry_lines = str(entry).split('\n')
