@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='SinkNode',
-    version='1.0.0dev2',
+    version='1.0.1dev2',
     packages=find_packages(),
     url='https:\\github.com\Leenix\SinkNode',
     license='',

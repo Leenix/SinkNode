@@ -15,7 +15,6 @@ class QueueWriter(Writer):
         self.formatter = RawFormatter(outbox=None, logger_level=logger_level, formatter_id=writer_id+"Formatter")
         super(QueueWriter, self).__init__(formatter=self.formatter, logger_level=logger_level, writer_id=writer_id)
 
-        assert isinstance(outbox, Queue)
         self.outbox = outbox
 
     def write_entry(self, entry):
