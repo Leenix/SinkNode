@@ -40,7 +40,7 @@ class LogFileWriter(Writer):
 
         for line in entry_lines:
             if self.timestamp_enabled:
-                logfile.write(datetime.datetime.now().isoformat())
+                logfile.write(datetime.datetime.now().strftime("%Y-%m-%d,%H:%M"))
                 logfile.write(",")
             logfile.write(str(line))
             logfile.write('\n')

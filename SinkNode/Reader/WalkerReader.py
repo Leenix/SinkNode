@@ -4,15 +4,11 @@ import datetime
 import struct
 
 
-
 class WalkerReader(XBeeReader):
     UNIT_CLASS = "stalker"
 
     def __init__(self, port, baud_rate, logger_name=__name__):
         super(WalkerReader, self).__init__(self, port, baud_rate)
-
-    # def __init__(self, port, baud, logger_name=__name__):
-      #  WalkerReader.__init__(self, port, baud, logger_name)
 
     def convert_to_json(self, entry_line):
         """
@@ -47,7 +43,7 @@ class WalkerReader(XBeeReader):
                 new_entry = 0
                 pass
 
-        logger.info("Received Data: {}".format(new_entry))
+        self.logger.info("Received Data: {}".format(new_entry))
         return new_entry
 
     def total_seconds(deltatime):
