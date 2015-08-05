@@ -16,6 +16,8 @@ local.properties
 .settings/
 .loadpath
 
+*workspace.*xml
+
 # External tool builders
 .externalToolBuilders/
 
