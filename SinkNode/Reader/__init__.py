@@ -54,10 +54,13 @@ class Reader(object):
         """
         while self.is_running:
             raw_entry = self.read_entry()
-            self.logger.debug("Raw entry: " + raw_entry)
+            self.logger.debug("Raw entry: " + str(raw_entry))
 
             processed_entry = self.convert_to_json(raw_entry)
-            self.outbox.put(processed_entry)
+            self.logger.debug("Processed entry: {}".format(processed_entry))
+
+            if processed_entry is not None:
+                self.outbox.put(processed_entry)
 
     def read_entry(self):
         """

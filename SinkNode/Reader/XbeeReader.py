@@ -1,6 +1,6 @@
 from xbee import ZigBee
-
 from SinkNode.Reader.SerialReader import *
+import json
 
 
 # This if statement removes errors when building the documentation
@@ -21,8 +21,8 @@ class XBeeReader(SerialReader):
     Individual packets parsed over serial port.
     """
     def __init__(self, port, baud_rate, logger_level=logging.FATAL):
-        super(XBeeReader, self).__init__(self, port, baud_rate, logger_level=logger_level)
-        self.xbee = ZigBee(self.ser)
+        super(XBeeReader, self).__init__(port, baud_rate, logger_level=logger_level)
+        self.xbee = ZigBee(self.ser, escaped=True)
         self.logger.name = "XBeeReader"
 
     def read_entry(self):
@@ -32,8 +32,4 @@ class XBeeReader(SerialReader):
         """
         frame = self.xbee.wait_read_frame()  # Data packet - read in the data
         if frame['id'] == 'rx' or frame['id'] == 'rx_explicit':
-            return frame['rf_data']
-
-
-
-
+            return json.dumps({"data": str(frame['rf_data']).encode('hex')})
