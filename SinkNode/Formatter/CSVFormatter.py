@@ -5,10 +5,10 @@ __author__ = 'Leenix'
 
 
 class CSVFormatter(Formatter):
-    def __init__(self, outbox=None, logger_level=logging.FATAL):
+    def __init__(self, outbox=None, logger_level=logging.FATAL, columns=[]):
         super(CSVFormatter, self).__init__(outbox=outbox, logger_level=logger_level, formatter_id="CSVFormatter")
 
-        self.columns = []
+        self.columns = columns
 
     def format_entry(self, entry):
         """
