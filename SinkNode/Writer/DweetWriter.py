@@ -5,8 +5,6 @@ from SinkNode.Formatter.RawFormatter import RawFormatter
 import requests
 import logging
 
-__author__ = 'Leenix'
-
 SERVER_ADDRESS = "http://dweet.io/dweet/for/"
 
 

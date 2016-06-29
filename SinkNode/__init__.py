@@ -28,9 +28,7 @@ class SinkNode:
         self.loggers = []
         self.writers = []
 
-        # At this point, only one reader is allowed
         self.readers = []
-        # TODO - Add the capacity for several readers (they just need to output to the same queue)
         if reader is not None:
             self.add_reader(reader)
 
@@ -133,8 +131,3 @@ class SinkNode:
                     writer.add_entry(entry.copy())
 
             self.read_queue.task_done()
-
-
-
-
-

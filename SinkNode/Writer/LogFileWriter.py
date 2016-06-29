@@ -30,20 +30,22 @@ class LogFileWriter(Writer):
         :return:
         """
         prefix = ""
-        if self.file_time_prefix is not None:
-            prefix = datetime.datetime.now().strftime(self.file_time_prefix)
 
-        logfile = open(self.path + prefix + self.filename, 'ab')
+        if len(entry) > 0:
+            if self.file_time_prefix is not None:
+                prefix = datetime.datetime.now().strftime(self.file_time_prefix)
 
-        # Add the entry line-by-line to include a timestamp on each line
-        entry_lines = str(entry).split('\n')
+            logfile = open(self.path + prefix + self.filename, 'ab')
 
-        for line in entry_lines:
-            if self.timestamp_format is not None:
-                logfile.write(datetime.datetime.now().strftime(self.timestamp_format))
-                logfile.write(",")
-            logfile.write(str(line))
-            logfile.write('\n')
-        logfile.close()
+            # Add the entry line-by-line to include a timestamp on each line
+            entry_lines = str(entry).split('\n')
+
+            for line in entry_lines:
+                if self.timestamp_format is not None:
+                    logfile.write(datetime.datetime.now().strftime(self.timestamp_format))
+                    logfile.write(",")
+                logfile.write(str(line))
+                logfile.write('\n')
+            logfile.close()
 
 

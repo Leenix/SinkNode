@@ -33,9 +33,9 @@ class SerialReader(Reader):
 
         try:
             self.logger.debug("Opening serial port [{}] with {} baud".format(self.port, self.baud_rate))
-            self.ser.setBaudrate(self.baud_rate)
+            self.ser.baudrate =self.baud_rate
             self.ser.setPort(self.port)
-            self.ser.setTimeout(1)
+            self.ser.timeout = 1
             self.ser.open()
 
         except SerialException:

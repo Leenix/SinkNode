@@ -15,13 +15,13 @@ class Reader(object):
     Data is converted into JSON format, then placed in a queue for processing.
     """
 
-    def __init__(self, outbox=None, logger_level=logging.FATAL, logger_format=LOGGER_FORMAT):
+    def __init__(self, outbox=None, logger_level=logging.FATAL, reader_id=__name__, logger_format=LOGGER_FORMAT):
         self.outbox = outbox
 
         self.is_running = False
         self.read_thread = Thread(target=self._read_loop)
 
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(reader_id)
         log_handler = logging.StreamHandler()
         log_handler.setFormatter(logging.Formatter(logger_format))
         self.logger.addHandler(log_handler)
@@ -82,10 +82,10 @@ class Reader(object):
 
         entry = ""
         try:
-            entry = json.loads(entry_line)
+            entry = json.loads(entry_line.replace("\r\n", "|"))
 
         except ValueError:
-            pass
+            self.logger.warning("Entry could not be converted to JSON: {}".format(entry_line))
 
         return entry
 
