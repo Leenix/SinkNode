@@ -1,9 +1,6 @@
-__author__ = 'Leenix'
 import datetime
-
-__author__ = 'Leenix'
-
 from SinkNode.Writer import *
+import json
 
 LOGGER_FORMAT = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
 
@@ -22,13 +19,9 @@ class SinkNode:
         # Set up queues to pass the data between the different processes
         self.read_queue = Queue()
 
-        # There are two write queues
-        # The writers in the Logger queue will always attempt to write any entry read in
-        # Writers in the Write queue will filter out entries based on entry 'id'
-        self.loggers = []
         self.writers = []
-
         self.readers = []
+
         if reader is not None:
             self.add_reader(reader)
 
@@ -44,26 +37,27 @@ class SinkNode:
         reader.set_outbox(self.read_queue)
         self.readers.append(reader)
 
-    def add_writer(self, writer):
+    def add_writer(self, writer, condition=None):
         """
         Add a writer to output the formatted data
         Writers only accept packets conditionally, if their id matches the id of the incoming entry.
         :param writer: Writer object
         :return:
         """
-        assert writer.get_id() is not ""
-        self.writers.append(writer)
+        self.writers.append([writer, condition])
         self.logger.debug("Writer added [%s]", writer.get_id())
 
-    def add_logger(self, logger):
+    def add_logger(self, logger, condition=None):
         """
         Add a logger to output the formatted data
         Loggers are non-conditional and will output every received entry.
         :param logger: Writer object
+        :param condition: Filtering condition for the writer. The ID of incoming entries must match for the writer to
+        record the entry. A condition of None removes the filter and makes the writer indiscriminate.
         :return:
         """
         assert isinstance(logger, Writer)
-        self.loggers.append(logger)
+        self.writers.append([logger, None])
         self.logger.debug("Logger added [%s]", logger.get_id())
 
     def start(self):
@@ -77,16 +71,10 @@ class SinkNode:
         for reader in self.readers:
             reader.start()
 
-        # Fire up the logger list
-        # TODO - start up writer threads on creation?
-        self.logger.debug("Starting loggers...")
-        for logger in self.loggers:
-            logger.start()
-
-        # Fire up the conditional writers
+        # Fire up the writers
         self.logger.debug("Starting writers...")
         for writer in self.writers:
-            writer.start()
+            writer[0].start()
 
         self.is_running = True
         self.process_thread.start()
@@ -103,11 +91,8 @@ class SinkNode:
         for reader in self.readers:
             reader.stop()
 
-        for logger in self.loggers:
-            logger.stop()
-
         for writer in self.writers:
-            writer.stop()
+            writer[0].stop()
 
         self.is_running = False
 
@@ -118,16 +103,24 @@ class SinkNode:
         :return:
         """
         while self.is_running:
-            entry = self.read_queue.get()
-            self.logger.info("Entry received - %s", datetime.datetime.now().isoformat())
+            try:
 
-            for logger in self.loggers:
-                self.logger.debug("Entry sent to logger [%s]", logger.get_id())
-                logger.add_entry(entry.copy())
+                entry = self.read_queue.get(block=True, timeout=2)
+                self.logger.info("Entry received - %s", datetime.datetime.now().isoformat())
 
-            for writer in self.writers:
-                if entry["id"] == writer.get_id():
-                    self.logger.debug("Entry sent to writer [%s]", writer.get_id())
-                    writer.add_entry(entry.copy())
+                try:
+                    assert not isinstance(entry, basestring)
+                    assert isinstance(entry, dict)
 
-            self.read_queue.task_done()
+                    for writer in self.writers:
+                        if writer[1] is None or entry["id"] == writer[1]:
+                            self.logger.debug("Entry sent to writer [%s]", writer[0].get_id())
+                            writer[0].add_entry(entry.copy())
+
+                except AssertionError:
+                    self.logger.error("Entry formatted incorrectly - Must be dictionary object")
+
+                self.read_queue.task_done()
+
+            except:
+                pass

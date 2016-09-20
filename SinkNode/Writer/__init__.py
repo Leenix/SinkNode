@@ -17,7 +17,7 @@ class Writer(object):
         self.id = writer_id
 
         if formatter is None:
-            formatter = RawFormatter()
+            formatter = RawFormatter.RawFormatter(logger_level=logger_level)
         self.formatter = formatter
 
         # Incoming entries are passed to the format queue, which are processed and passed to the write queue
@@ -77,10 +77,13 @@ class Writer(object):
         :return:
         """
         while self.is_running:
-            formatted_entry = self.write_queue.get()
-            self.write_entry(formatted_entry)
-            self.write_queue.task_done()
-            self.logger.info("Entry written")
+            try:
+                formatted_entry = self.write_queue.get(block=True, timeout=2)
+                self.write_entry(formatted_entry)
+                self.write_queue.task_done()
+                self.logger.info("Entry written")
+            except:
+                pass
 
     def get_id(self):
         """

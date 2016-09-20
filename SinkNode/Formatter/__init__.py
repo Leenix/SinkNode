@@ -61,13 +61,18 @@ class Formatter(object):
         """
         while self.is_running:
             # Process away and pass the entry to the out pile
-            raw_entry = self.inbox.get()
-            formatted_entry = self.format_entry(raw_entry)
-            self.logger.debug("Formatted entry: [%s]", str(formatted_entry))
-            self.outbox.put(formatted_entry)
 
-            # Job done; cross it off the inbox to-do list
-            self.inbox.task_done()
+            try:
+                raw_entry = self.inbox.get(block=True, timeout=2)
+                formatted_entry = self.format_entry(raw_entry)
+                self.logger.debug("Formatted entry: [%s]", str(formatted_entry))
+                self.outbox.put(formatted_entry)
+
+                # Job done; cross it off the inbox to-do list
+                self.inbox.task_done()
+
+            except:
+                pass
 
     def format_entry(self, entry):
         """

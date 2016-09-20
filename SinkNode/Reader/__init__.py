@@ -59,7 +59,7 @@ class Reader(object):
             processed_entry = self.convert_to_json(raw_entry)
             self.logger.debug("Processed entry: {}".format(processed_entry))
 
-            if processed_entry is not None:
+            if processed_entry is not None and self.outbox is not None:
                 self.outbox.put(processed_entry)
 
     def read_entry(self):

@@ -40,7 +40,7 @@ class CSVFormatter(Formatter):
             keys = entry.keys()
             for key in keys:
 
-                self.columns.append(key)
+                self.columns.append(str(key))
                 output += str(entry.pop(key))
                 output += ","
 
